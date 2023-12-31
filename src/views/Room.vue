@@ -3,35 +3,33 @@
       <div class="content">
         <div class="nav-content">
           <h1 class="cust">
-            Vehicle
-            <RouterLink to="/vehiclecreate" class="plus">Add</RouterLink>
+            ROOM
+            <RouterLink to="/roomcreate" class="plus">Add</RouterLink>
           </h1>
         </div>
-        <div class="table-vehicles">
+        <div class="table-rooms">
           <table class="table table-bordered table-striped">
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Make</th>
-                <th>Model</th>
-                <th>Year</th>
-                <th>Color Number</th>
-                <th>Transmission</th>
+                <th>Room No.</th>
+                <th>Room Type</th>
+                <th>Occupancy Limit</th>
                 <th>Price</th>
-                <th>Modify</th>
+                <th>Availability</th>
+                <th>Delete</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="vehicle in vehicles" :key="vehicle.id">
-                <td>{{ vehicle . id }}</td>
-                <td>{{ vehicle . make }}</td>
-                <td>{{ vehicle . model }}</td>
-                <td>{{ vehicle . year }}</td>
-                <td>{{ vehicle . color }}</td>
-                <td>{{ vehicle . transmission }}</td>
-                <td>{{ vehicle . price}}</td>
+              <tr v-for="room in rooms" :key="room.id">
+                <td>{{ room . id }}</td>
+                <td>{{ room . room_no }}</td>
+                <td>{{ room . room_type }}</td>
+                <td>{{ room . occupancy_limit }}</td>
+                <td>{{ room . price }}</td>
+                <td>{{ room . is_available }}</td>
                 <td>
-                  <button @click="deleteVehicle(vehicle.id)" class="btn btn-danger">Delete</button>
+                  <button @click="deleteRoom(room.id)" class="btn btn-danger">Delete</button>
                 </td>
               </tr>
             </tbody>
@@ -105,28 +103,28 @@
 
   import { onMounted, ref } from 'vue';
 
-  const vehicles = ref([]);
+  const rooms = ref([]);
 
   onMounted(() => {
-    fetch('http://localhost:8000/api/vehicles')
-      .then(response => response.json().then(data => (vehicles.value = data)));
+    fetch('http://localhost:8000/api/rooms')
+      .then(response => response.json().then(data => (rooms.value = data)));
   });
 
-  const deleteVehicle = async (customerId) => {
+  const deleteRoom = async (guestId) => {
     try {
-      const response = await fetch('http://localhost:8000/api/customers/' + customerId, {
+      const response = await fetch('http://localhost:8000/api/guests/' + guestId, {
         method: 'DELETE',
       });
 
 
       if (response.ok) {
-        customers.value = customers.value.filter((customer) => customer.id !== customerId);
-        alert('Customer deleted successfully!');
+        guests.value = guests.value.filter((guest) => guest.id !== guestId);
+        alert('Guest deleted successfully!');
       } else {
-        console.error('Failed to delete customer:', response.statusText);
+        console.error('Failed to delete guest:', response.statusText);
       }
     } catch (error) {
-      console.error('Error deleting customer:', error);
+      console.error('Error deleting guest:', error);
     }
   };
 
@@ -162,7 +160,7 @@
 // });
 
   
-//   const deleteVehicle = async (vehicleId) => {
+//   const deleteRoom = async (vehicleId) => {
 //     try {
 //       const response = await fetch(`http://localhost:8000/api/vehicles/${vehicleId}`, {
 //         method: 'DELETE',

@@ -3,41 +3,31 @@
       <div class="content">
       <div class="nav-content">
         <h1 class="cust">
-          ORDER
-          <RouterLink to="/ordercreate" class="plus">Add</RouterLink>
+          BOOKING
+          <RouterLink to="/bookingcreate" class="plus">Add</RouterLink>
         </h1>
       </div>
-      <div class="table-orders">
+      <div class="table-bookings">
         <table class="table table-bordered table-striped">
           <thead>
             <tr>
               <th>ID</th>
-              <th>Customer ID</th>
-              <th>Customer's Name</th>
-              <th>Vehicle ID</th>
-              <th>Make</th>
-              <th>Model</th>
-              <th>Year</th>
-              <th>Transmission</th>
-              <th>Quantity</th>
-              <th>Total Amount</th>
+              <th>Guest ID</th>
+              <th>Room ID</th>
+              <th>Check-in</th>
+              <th>Check-out</th>
               <th>Modify</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="order in orders" :key="order.id">
-              <td>{{ order.id }}</td>
-              <td>{{ order.customer?.id }}</td>
-              <td>{{ order.customer?.fullname }}</td>
-              <td>{{ order.vehicle?.id }}</td>
-              <td>{{ order.vehicle?.make }}</td>
-              <td>{{ order.vehicle?.model }}</td>
-              <td>{{ order.vehicle?.year }}</td>
-              <td>{{ order.vehicle?.transmission }}</td>
-              <td>{{ order.quantity }}</td>
-              <td>{{ order.total_amount }}</td>
+            <tr v-for="booking in bookings" :key="booking.id">
+              <td>{{ booking.id }}</td>
+              <td>{{ booking.guest?.id }}</td>
+              <td>{{ booking.room?.id }}</td>
+              <td>{{ booking.check_in }}</td>
+              <td>{{ booking.check_out }}</td>
               <td>
-                <button @click="deleteOrder(order.id)" class="btn btn-danger">Delete</button>
+                <button @click="deleteBooking(booking.id)" class="btn btn-danger">Delete</button>
               </td>
             </tr>
           </tbody>
@@ -115,10 +105,10 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 
-const orders = ref([]);
+const bookings = ref([]);
 
 onMounted(() => {
-  fetch('http://localhost:8000/api/orders')
+  fetch('http://localhost:8000/api/bookings')
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -126,10 +116,9 @@ onMounted(() => {
       return response.json();
     })
     .then(data => {
-      const promises = data.map(order => {
-        // Fetch data for the customer
-        const customerFetchUrl = `http://localhost:8000/api/customers/${order.customer_id}`;
-        const customerPromise = fetch(customerFetchUrl)
+      const promises = data.map(booking => {
+        const guestFetchUrl = `http://localhost:8000/api/guests/${booking.guest_id}`;
+        const guestPromise = fetch(guestFetchUrl)
           .then(response => {
             if (!response.ok) {
               throw new Error('Network response was not ok');
@@ -138,8 +127,8 @@ onMounted(() => {
           });
 
         // Fetch data for the vehicle
-        const vehicleFetchUrl = `http://localhost:8000/api/vehicles/${order.vehicle_id}`;
-        const vehiclePromise = fetch(vehicleFetchUrl)
+        const roomFetchUrl = `http://localhost:8000/api/rooms/${booking.room_id}`;
+        const roomPromise = fetch(roomFetchUrl)
           .then(response => {
             if (!response.ok) {
               throw new Error('Network response was not ok');
@@ -147,22 +136,22 @@ onMounted(() => {
             return response.json();
           });
 
-        // Combine promises for customer and vehicle
-        return Promise.all([customerPromise, vehiclePromise])
-          .then(([customerData, vehicleData]) => {
-            console.log('Customer Data:', customerData);
-            console.log('Vehicle Data:', vehicleData);
+        // Combine promises for guest and room
+        return Promise.all([guestPromise, roomPromise])
+          .then(([guestData, roomData]) => {
+            console.log('Guest Data:', guestData);
+            console.log('Room Data:', roomData);
 
-            // Return order with both customer, and vehicle data
-            return { ...order, customer: customerData, vehicle: vehicleData };
+            // Return booking with both guest, and room data
+            return { ...booking, guest: guestData, room: roomData };
           });
       });
 
       return Promise.all(promises);
     })
-    .then(ordersWithCustomers => {
-      console.log('Orders with Customers and Vehicles:', ordersWithCustomers);
-      orders.value = ordersWithCustomers;
+    .then(bookingsWithCustomers => {
+      console.log('Bookings with Guest and Rooms:', bookingsWithCustomers);
+      bookings.value = bookingsWithCustomers;
     })
     .catch(error => console.error('Error fetching data:', error.message));
 });

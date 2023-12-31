@@ -3,31 +3,37 @@
       <div class="content">
         <div class="nav-content">
           <h1 class="cust">
-            CUSTOMER
-            <RouterLink to="/customercreate" class="plus">Add</RouterLink>
+            GUEST
+            <RouterLink to="/guestcreate" class="plus">Add</RouterLink>
           </h1>
         </div>
-        <div class="table-customers">
+        <div class="table-guests">
           <table class="table table-bordered table-striped " >
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Name</th>
+                <th>Fullname</th>
                 <th>Email</th>
-                <th>Address</th>
                 <th>Phone Number</th>
+                <th>Check-in Date</th>
+                <th>Check-out Date</th>
+                <th>Room Type</th>
+                <th>Total Guests</th>
                 <th>Modify</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="customer in customers" :key="customer.id">
-                <td>{{ customer.id }}</td>
-                <td>{{ customer.fullname }}</td>
-                <td>{{ customer.email }}</td>
-                <td>{{ customer.address }}</td>
-                <td>{{ customer.phoneNumber }}</td>
+              <tr v-for="guest in guests" :key="guest.id">
+                <td>{{ guest.id }}</td>
+                <td>{{ guest.full_name }}</td>
+                <td>{{ guest.email }}</td>
+                <td>{{ guest.phoneNumber }}</td>
+                <td>{{ guest.check_in_date }}</td>
+                <td>{{ guest.check_out_date }}</td>
+                <td>{{ guest.room_type }}</td>
+                <td>{{ guest.total_guests }}</td>
                 <td>
-                  <button @click="deleteCustomer(customer.id)" class="btn btn-danger">Delete</button>
+                  <button @click="deleteGuest(guest.id)" class="btn btn-danger">Delete</button>
                 </td>
               </tr>
             </tbody>
@@ -100,28 +106,28 @@
   <script setup>
   import { onMounted, ref } from 'vue';
   
-  const customers = ref([]);
+  const guests = ref([]);
   
   onMounted(() => {
-    fetch('http://localhost:8000/api/customers')
-      .then(response => response.json().then(data => (customers.value = data)));
+    fetch('http://localhost:8000/api/guests')
+      .then(response => response.json().then(data => (guests.value = data)));
   });
   
-  const deleteCustomer = async (customerId) => {
+  const deleteGuest = async (guestId) => {
     try {
-        const response = await fetch('http://localhost:8000/api/customers/' + customerId, {
+        const response = await fetch('http://localhost:8000/api/guests/' + guestId, {
         method: 'DELETE',
     });
 
   
       if (response.ok) {
-        customers.value = customers.value.filter((customer) => customer.id !== customerId);
-        alert('Customer deleted successfully!');
+        guests.value = guests.value.filter((guest) => guest.id !== guestId);
+        alert('Guest deleted successfully!');
       } else {
-        console.error('Failed to delete customer:', response.statusText);
+        console.error('Failed to delete guest:', response.statusText);
       }
     } catch (error) {
-      console.error('Error deleting customer:', error);
+      console.error('Error deleting guest:', error);
     }
   };
 </script>
